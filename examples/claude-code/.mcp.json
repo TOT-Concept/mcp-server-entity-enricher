@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "entity-enricher": {
+      "type": "http",
+      "url": "https://entityenricher.ai/api/mcp/",
+      "headers": {
+        "X-API-Key": "ent_your_key_here"
+      }
+    }
+  }
+}

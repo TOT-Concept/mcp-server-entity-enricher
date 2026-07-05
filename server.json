@@ -1,0 +1,25 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-09-29/server.schema.json",
+  "name": "io.github.tot-concept/mcp-server-entity-enricher",
+  "description": "Multi-LLM entity enrichment: schemas, single/batch enrichment, fusion, model benchmarks.",
+  "version": "1.0.0",
+  "websiteUrl": "https://entityenricher.ai/docs/integrations/mcp",
+  "repository": {
+    "url": "https://github.com/TOT-Concept/mcp-server-entity-enricher",
+    "source": "github"
+  },
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://entityenricher.ai/api/mcp/",
+      "headers": [
+        {
+          "name": "X-API-Key",
+          "description": "Entity Enricher API key (ent_...), created in the web UI under Settings -> API Keys. Clients that support OAuth 2.1 (e.g. claude.ai) can omit it and authorize interactively instead.",
+          "isRequired": false,
+          "isSecret": true
+        }
+      ]
+    }
+  ]
+}
