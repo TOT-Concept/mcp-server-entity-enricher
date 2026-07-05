@@ -15,7 +15,7 @@
       "headers": [
         {
           "name": "X-API-Key",
-          "description": "Entity Enricher API key (ent_...), created in the web UI under Settings -> API Keys. Clients that support OAuth 2.1 (e.g. claude.ai) can omit it and authorize interactively instead.",
+          "description": "Optional. OAuth 2.1 is the primary auth: clients implementing the standard MCP auth spec (claude.ai, Claude Code, Cursor) omit this header and authorize interactively via browser consent. Use an Entity Enricher API key (ent_..., created under Settings -> API Keys) only for static-config or headless clients.",
           "isRequired": false,
           "isSecret": true
         }

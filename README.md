@@ -22,57 +22,66 @@ configs; the server implementation lives in the Entity Enricher platform.
 
 ## Quickstart
 
-**Connecting from claude.ai?** Skip the key — add a custom connector with URL
-`https://entityenricher.ai/api/mcp/` and authorize via OAuth.
-See [examples/claude-ai-remote.md](examples/claude-ai-remote.md).
+### Option 1 — OAuth (recommended)
 
-### 1. Create an API key
-
-In the [Entity Enricher web UI](https://entityenricher.ai): **Settings → API Keys → New
-organization access key**. Pick a role — operator (read-mostly), editor (create/edit schemas),
-or owner (full control, required for benchmarks). Copy the `ent_…` value; it's only shown once.
-
-### 2. Register the server in your client
+For claude.ai, Claude Code, Cursor, and any MCP client that implements the standard OAuth
+flow. **No API key to create or paste** — the client discovers the authorization server
+automatically, your browser opens the Entity Enricher consent screen, and the connection acts
+on your behalf with your own role. Revoke it anytime under **Settings → API Keys → Connected
+Apps**.
 
 <details open>
 <summary><strong>Claude Code</strong></summary>
 
 ```bash
-claude mcp add --transport http entity-enricher https://entityenricher.ai/api/mcp/ \
-  --header "X-API-Key: ent_your_key_here"
+claude mcp add --transport http entity-enricher https://entityenricher.ai/api/mcp/
 ```
 
-More options (project `.mcp.json`, env-var key): [examples/claude-code/](examples/claude-code/)
+Then run `/mcp` in a session and pick **Authenticate** — your browser opens the consent page.
+More options (project `.mcp.json`, API-key fallback): [examples/claude-code/](examples/claude-code/)
 </details>
 
 <details>
-<summary><strong>Claude Desktop</strong></summary>
+<summary><strong>claude.ai</strong></summary>
 
-Edit `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) or
-`%APPDATA%\Claude\claude_desktop_config.json` (Windows):
-
-```json
-{
-  "mcpServers": {
-    "entity-enricher": {
-      "url": "https://entityenricher.ai/api/mcp/",
-      "headers": { "X-API-Key": "ent_your_key_here" }
-    }
-  }
-}
-```
-
-Restart Claude Desktop. Full file: [examples/claude-desktop/](examples/claude-desktop/)
+**Settings → Connectors → Add custom connector** with URL
+`https://entityenricher.ai/api/mcp/`, then click **Authorize** on the consent screen.
+Walkthrough: [examples/claude-ai-remote.md](examples/claude-ai-remote.md)
 </details>
 
 <details>
-<summary><strong>Cursor / Continue / Zed / other MCP clients</strong></summary>
+<summary><strong>Cursor / other OAuth-capable clients</strong></summary>
 
-The same `mcpServers` snippet works anywhere remote HTTP servers with custom headers are
-supported: [examples/cursor/mcp.json](examples/cursor/mcp.json)
+Register the URL with no headers and the client prompts you to sign in:
+[examples/cursor/mcp.json](examples/cursor/mcp.json)
 </details>
 
-### 3. Try it
+### Option 2 — API key (static JSON configuration)
+
+For clients configured via a JSON file rather than an interactive sign-in (Claude Desktop,
+Continue, Zed) — and for headless/CI use.
+
+1. In the [Entity Enricher web UI](https://entityenricher.ai): **Settings → API Keys → New
+   organization access key**. Pick a role — operator (read-mostly), editor (create/edit
+   schemas), or owner (full control, required for benchmarks). Copy the `ent_…` value; it's
+   only shown once.
+2. For **Claude Desktop**, edit `~/Library/Application Support/Claude/claude_desktop_config.json`
+   (macOS) or `%APPDATA%\Claude\claude_desktop_config.json` (Windows):
+
+   ```json
+   {
+     "mcpServers": {
+       "entity-enricher": {
+         "url": "https://entityenricher.ai/api/mcp/",
+         "headers": { "X-API-Key": "ent_your_key_here" }
+       }
+     }
+   }
+   ```
+
+   Restart Claude Desktop. Full file: [examples/claude-desktop/](examples/claude-desktop/)
+
+### Try it
 
 > List my Entity Enricher schemas, then enrich "Sanofi" against the pharmaceutical company
 > schema in English and French.
@@ -199,11 +208,14 @@ Errors are structured dicts with an `error_code` field the client can pattern-ma
 
 ## Authentication details
 
-- **X-API-Key** — `ent_…` organization access keys, created in Settings → API Keys. The role
-  attached to the key (operator / editor / owner) gates which tools succeed.
-- **OAuth 2.1** — for clients that can't ship a static header (claude.ai). Standard discovery
-  via `/.well-known/oauth-protected-resource`, dynamic client registration, PKCE. Tokens are
-  audience-bound and instantly revocable under **Settings → API Keys → Connected Apps**.
+- **OAuth 2.1 (recommended)** — any MCP client implementing the standard auth spec (claude.ai,
+  Claude Code, Cursor, MCP Inspector) discovers it automatically: standard discovery via
+  `/.well-known/oauth-protected-resource`, dynamic client registration, PKCE, browser consent.
+  No key to create or paste. Tokens are audience-bound and instantly revocable under
+  **Settings → API Keys → Connected Apps**.
+- **X-API-Key** — for clients configured via a static JSON file: `ent_…` organization access
+  keys, created in Settings → API Keys. The role attached to the key (operator / editor /
+  owner) gates which tools succeed.
 
 ## Links
 

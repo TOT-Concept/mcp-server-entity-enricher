@@ -3,7 +3,8 @@
 Goal: go from "I want structured data about *X*" to a saved, reusable enrichment schema and a
 first enriched record — entirely inside one chat.
 
-Requires an API key with the **editor** role (or higher).
+Requires the **editor** role (or higher) — your own role when connected via OAuth, or the
+key's role when using an API key.
 
 ## 1. Generate a sample entity
 

@@ -1,8 +1,10 @@
 # claude.ai (remote connector, OAuth)
 
-claude.ai can't ship a static header, so the Entity Enricher backend embeds a full OAuth 2.1
-authorization server. **No API key is needed** — the connection is authorized interactively and
-acts with your own Entity Enricher role.
+OAuth 2.1 is the primary way to connect to Entity Enricher: the backend embeds a full
+authorization server, and any MCP client implementing the standard auth spec (claude.ai,
+Claude Code, Cursor, MCP Inspector) discovers it automatically. **No API key is needed** —
+the connection is authorized interactively and acts with your own Entity Enricher role.
+This walkthrough covers claude.ai, where OAuth is required for the connector directory.
 
 ## Connect
 

@@ -3,8 +3,9 @@
 Goal: compare LLM models on a **saved, reusable enrichment test** — same schema, same entity,
 same settings — with every result auto-scored against a gold reference.
 
-Requires an API key with the **owner** role and a plan that includes Model Benchmarks
-(otherwise tools return `benchmarks_not_in_plan`).
+Requires the **owner** role — your own role when connected via OAuth, or the key's role when
+using an API key — and a plan that includes Model Benchmarks (otherwise tools return
+`benchmarks_not_in_plan`).
 
 ## 1. Create the scenario
 
