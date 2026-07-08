@@ -117,7 +117,7 @@ Copy-paste chat walkthroughs of the three flows people ask about most:
 | Schemas | `create_schema_from_sample` | Generate a new JSON schema from a sample entity dict, using an LLM to infer field types, key properties, and expertise grouping; the result is auto-saved to your organization. |
 | Schemas | `edit_schema` | Modify an existing saved schema using a natural-language prompt, via an LLM (e.g. 'add a regulatory_status field marked as a key property', 'remove the founding_year field', 'mark… |
 | Schemas | `save_schema` | Persist a schema you authored directly (no LLM call, no cost) as a new saved schema. |
-| Schemas | `update_schema` | Update a saved schema without an LLM call: rename, replace the schema_content, change tags, or pin/unpin. |
+| Schemas | `update_schema` | Update a saved schema without an LLM call: rename, replace the schema_content, change tags, pin/unpin, or toggle non-determinism analysis. |
 | Schemas | `delete_schema` | Soft-delete a saved schema by ID (restorable server-side shortly after; permanent deletion stays in the web UI). |
 | Schemas | `analyze_sample_determinism` | Flag properties in a sample entity whose enriched value would DIFFER across models or reruns (non-deterministic names: temporal / ambiguous / subjective / multi-valued). |
 | Schemas | `analyze_schema_determinism` | Analyze a saved schema and write a `non_determinism` flag onto each property whose enriched value is likely to vary across models/runs (badge in the editor). |
