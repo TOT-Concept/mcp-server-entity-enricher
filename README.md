@@ -134,11 +134,11 @@ Copy-paste chat walkthroughs of the three flows people ask about most:
 | Records & stats | `get_stats` | Aggregated statistics over your organization's enrichment records: totals, success rate, token usage, and cost summary. |
 | Benchmarks | `list_benchmark_scenarios` | List the organization's benchmark scenarios (saved, reusable enrichment tests: schema + entity + strategy + scoring config). |
 | Benchmarks | `get_benchmark_scenario` | Fetch one benchmark scenario with its per-model results (quality / cost / speed scores; results whose config_hash differs from the scenario's are stale — re-run those models). |
-| Benchmarks | `create_benchmark_scenario` | Create a benchmark scenario — a reusable test that enriches ONE fixed entity against a saved schema and scores each model's output against a gold reference. |
+| Benchmarks | `create_benchmark_scenario` | Create a benchmark scenario — a reusable model test. |
 | Benchmarks | `update_benchmark_scenario` | Update a benchmark scenario. |
-| Benchmarks | `set_benchmark_reference` | Save a scenario's gold reference — the expected enrichment output each model result is scored against, and the gate between create_benchmark_scenario and run_benchmark. |
+| Benchmarks | `set_benchmark_reference` | Save a scenario's gold reference — the expected output each model result is scored against, and the gate between create_benchmark_scenario and run_benchmark. |
 | Benchmarks | `delete_benchmark_scenario` | Delete a benchmark scenario and its results. |
-| Benchmarks | `run_benchmark` | Launch a benchmark run — the final step of the benchmark lifecycle: enrich the scenario's fixed entity with each selected model (repetitions per model as configured), auto-score… |
+| Benchmarks | `run_benchmark` | Launch a benchmark run — the final step of the benchmark lifecycle: execute the scenario's task (enrichment / sample generation / schema generation) with each selected model… |
 | Attachments | `upload_attachment` | Upload a file (base64-encoded) so it can be used as source material in LLM flows. |
 | Attachments | `delete_attachment` | Permanently remove an attachment from the server by id. |
 <!-- TOOL_TABLE_END -->
