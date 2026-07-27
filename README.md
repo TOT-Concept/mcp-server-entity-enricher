@@ -141,12 +141,12 @@ Copy-paste chat walkthroughs of the three flows people ask about most:
 | Benchmarks | `run_benchmark` | Launch a benchmark run — the final step of the benchmark lifecycle: execute the scenario's task (enrichment / sample generation / schema generation) with each selected model… |
 | Attachments | `upload_attachment` | Upload a file (base64-encoded) so it can be used as source material in LLM flows. |
 | Attachments | `delete_attachment` | Permanently remove an attachment from the server by id. |
-| Databases | `list_schema_databases` | List the schema databases (entity-layer sync) registered on a saved schema, with pending delta counts. |
-| Databases | `create_schema_database` | Register a database on a saved schema — the opt-in that turns enrichments into relational SQL deltas the user syncs to their own PostgreSQL/MySQL/SQLite with the ee-database CLI… |
-| Databases | `delete_schema_database` | Delete a schema database registration and its queued deltas. |
-| Databases | `create_database_credential` | (Re)issue the sync-client credential of a schema database — the pairing step of the ee-database CLI workflow. |
-| Databases | `fetch_database_deltas` | Fetch the next FIFO window of SQL deltas for a schema database. |
-| Databases | `ack_database_deltas` | Acknowledge applied database deltas up to an id: releases the lease and, per the database's options, purges delivered copies and fully-delivered entity state. |
+| Database Sync | `list_database_syncs` | List the database syncs registered on a saved schema, with pending delta counts. |
+| Database Sync | `create_database_sync` | Connect a database to a saved schema — the opt-in that turns enrichments into relational SQL deltas the user applies to their own PostgreSQL/MySQL/SQLite with the ee-database CLI… |
+| Database Sync | `delete_database_sync` | Delete a database sync and its queued deltas. |
+| Database Sync | `create_database_credential` | (Re)issue the sync-client credential of a database sync — the pairing step of the ee-database CLI workflow. |
+| Database Sync | `fetch_database_deltas` | Fetch the next FIFO window of SQL deltas for a database sync. |
+| Database Sync | `ack_database_deltas` | Acknowledge applied database deltas up to an id: releases the lease and, per the database's options, purges delivered copies and fully-delivered entity state. |
 <!-- TOOL_TABLE_END -->
 
 Tool behaviour is identical to the REST endpoints they wrap — same validation, billing and plan
