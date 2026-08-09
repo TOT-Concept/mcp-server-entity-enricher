@@ -16,10 +16,58 @@ client and, from inside a chat:
 - **Fuse multi-model results** — conflicts detected field-by-field, resolved by voting or LLM arbitration.
 - **Benchmark models on your own data** — saved scenarios, gold references, auto-scored quality / cost / speed.
 - **Ground enrichments in documents** — upload PDFs, images or audio and attach them to any flow.
+- **Land it all in your own database** — as real, migrated relational tables, synced by a client you run.
 
 No install, no local process: the server runs at `https://entityenricher.ai/api/mcp/`
 (streamable HTTP). This repository holds the public documentation and ready-to-use client
-configs; the server implementation lives in the Entity Enricher platform.
+configs; the server implementation lives in the Entity Enricher platform. (The one optional
+local binary is the database sync client below — and only if you want the rows in a database of
+your own.)
+
+### Enrichments become a real database — yours
+
+The enrichment is the easy half. What you normally end up building yourself — the tables to
+hold the results, the DDL, the migration when the shape changes, and a loader that keeps it
+consistent — is what a **database sync** does for you, and a chat is a good place to drive it:
+
+- **A designed schema, not a JSON dump.** `create_database_sync` connects a database to a saved
+  schema, and Entity Enricher derives the relational model from it: a table per entity type,
+  `PRIMARY KEY`s, real `FOREIGN KEY`s, child tables for the parts an entity owns, junction
+  tables for entities it merely references (one row many parents point at, not a copy per
+  parent), typed columns, and indexes on what a list screen actually filters and sorts on. An
+  LLM pass proposes each column's SQL contract — ask your client to read it back and fix what
+  it got wrong (`classify_database_model`, `update_schema`) before anything ships.
+- **Migrations you don't write.** `publish_schema` turns the working copy into the contract:
+  the change is diffed against what each database has actually shipped and travels down the
+  same feed as the data — additive DDL applied silently, riskier transforms (a re-key, a type
+  change, a renamed column) held for your confirmation. No hand-written `ALTER`, no drift.
+- **Synced by an open-source client you run.** `create_database_credential` issues the pairing
+  token for [`ee-database`](https://github.com/TOT-Concept/ee-database) — an MIT-licensed Go
+  binary that lives next to *your* PostgreSQL, MySQL or SQLite. It connects **outward** over
+  WSS and **your connection string never leaves the machine**: Entity Enricher never holds a
+  credential to your database. It bootstraps from a `.sql` snapshot, applies each leased batch
+  transactionally, acknowledges it, and halts loudly on a failing delta rather than skipping
+  it. Releases are **Sigstore-signed** and the installer verifies that signature against the
+  publishing workflow's identity before the binary is ever executable.
+
+```
+  your schema ──┬──▶ relational model   tables, PK/FK, child + junction tables, indexes
+                ├──▶ migrations         schema edits, diffed and shipped as DDL
+                └──▶ rows               every enrichment, merged into current state
+                             │
+                             │  one ordered feed, leased and acknowledged
+                             ▼
+                    ee-database  ──  MIT-licensed, Sigstore-signed, outbound WSS only
+                             │       (your DSN never leaves your machine)
+                             ▼
+              your PostgreSQL · MySQL · SQLite
+```
+
+A client that can run commands (Claude Code) carries the whole loop, install included; any
+other client walks you through it and you paste one line into a terminal. No replica at all?
+`list_entity_states` browses the same merged rows server-side, and `fetch_database_deltas` /
+`ack_database_deltas` let a client apply the feed itself. Walkthrough:
+[Database sync recipe](examples/recipes/database-sync.md).
 
 Listed on the [official MCP Registry](https://registry.modelcontextprotocol.io) as
 **`ai.entityenricher/enricher`** (see [server.json](server.json)).
@@ -93,15 +141,18 @@ Continue, Zed) — and for headless/CI use.
 Claude discovers the tools automatically, confirms the model and schema choice with you, and
 returns the structured result inline.
 
-## Recipes
+## Examples & recipes
 
-Copy-paste chat walkthroughs of the three flows people ask about most:
+Client configs and copy-paste chat walkthroughs live in [examples/](examples/):
 
 | Recipe | What it covers |
 |---|---|
 | [Schema from sample](examples/recipes/schema-from-sample.md) | generate a sample → schema → refine → first enrichment |
+| [Database sync](examples/recipes/database-sync.md) | schema → designed tables → publish → pair `ee-database` → migrations |
 | [Batch enrichment](examples/recipes/batch-enrichment.md) | entity lists, external APIs, async polling, partial-failure retry |
 | [Model benchmark](examples/recipes/model-benchmark.md) | scenarios, gold references, auto-scored model comparison |
+
+Per-client setup and examples: [Claude Code](examples/claude-code/) · [claude.ai](examples/claude-ai-remote.md) · [Claude Desktop](examples/claude-desktop/) · [Cursor](examples/cursor/mcp.json)
 
 ## Tools
 
