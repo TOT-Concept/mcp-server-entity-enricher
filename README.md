@@ -166,7 +166,6 @@ Per-client setup and examples: [Claude Code](examples/claude-code/) · [claude.a
 | Schemas | `list_schemas` | List saved JSON schemas in your organization, pinned ones first. |
 | Schemas | `get_schema` | Fetch the full content of a saved schema by ID, including all properties, key fields, expertise domains, and validation rules. |
 | Schemas | `create_schema_from_sample` | Generate and auto-save a JSON schema whose paths and types strictly follow an approved sample. |
-| Schemas | `edit_schema` | Modify an existing saved schema using a natural-language prompt, via an LLM (e.g. 'add a regulatory_status field marked as a key property', 'remove the founding_year field', 'mark… |
 | Schemas | `save_schema` | Persist a schema you authored directly (no LLM call, no cost) as a new saved schema. |
 | Schemas | `update_schema` | Update a saved schema without an LLM call: rename, replace the schema_content, change tags, pin/unpin, or toggle non-determinism analysis. |
 | Schemas | `publish_schema` | Publish a linked schema's working copy as its contract (publish model): enrichment and the linked database syncs follow the published content only, so structural edits (new… |
@@ -202,6 +201,7 @@ Per-client setup and examples: [Claude Code](examples/claude-code/) · [claude.a
 | Database Sync | `create_database_credential` | (Re)issue the sync-client credential of a database sync — the pairing step of the ee-database CLI workflow. |
 | Database Sync | `fetch_database_deltas` | Fetch the next FIFO window of SQL deltas for a database sync. |
 | Database Sync | `ack_database_deltas` | Acknowledge applied database deltas up to an id: releases the lease and, per the database's options, purges delivered copies and fully-delivered entity state. |
+| Database Sync | `sync_records_to_database` | Push already-stored enrichment output into the entity layer, so it reaches the schema's database sync. |
 <!-- TOOL_TABLE_END -->
 
 Tool behaviour is identical to the REST endpoints they wrap — same validation, billing and plan
