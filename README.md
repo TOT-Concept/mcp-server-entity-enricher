@@ -170,8 +170,8 @@ Per-client setup and examples: [Claude Code](examples/claude-code/) · [claude.a
 | Schemas | `update_schema` | Update a saved schema without an LLM call: rename, replace the schema_content, change tags, pin/unpin, or toggle non-determinism analysis. |
 | Schemas | `publish_schema` | Publish a linked schema's working copy as its contract (publish model): enrichment and the linked database syncs follow the published content only, so structural edits (new… |
 | Schemas | `delete_schema` | Soft-delete a saved schema by ID (restorable server-side shortly after; permanent deletion stays in the web UI). |
-| Schemas | `analyze_sample_determinism` | Flag properties in a sample entity whose enriched value would DIFFER across models or reruns (non-deterministic names: temporal / ambiguous / subjective / multi-valued). |
-| Schemas | `analyze_schema_determinism` | Analyze a saved schema and write a `non_determinism` flag onto each property whose enriched value is likely to vary across models/runs (badge in the editor). |
+| Schemas | `analyze_sample` | Analyze a sample entity before schema generation, two checks in one call. |
+| Schemas | `analyze_schema` | Analyze a saved schema, two checks in one call, and write the verdicts onto its properties. |
 | Enrichment & fusion | `start_batch_enrichment` | Start an asynchronous batch enrichment against a JSON schema and return {job_id, total} immediately. |
 | Enrichment & fusion | `fetch_entities` | Fetch a JSON array of entities from an external REST API (GET), server-side — the input step before start_batch_enrichment. |
 | Enrichment & fusion | `enrich_entity` | Run a multi-model enrichment of a single entity against a JSON schema, returning the fused/best structured result. |
