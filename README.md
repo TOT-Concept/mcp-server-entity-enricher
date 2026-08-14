@@ -193,7 +193,7 @@ Per-client setup and examples: [Claude Code](examples/claude-code/) · [claude.a
 | Attachments | `upload_attachment` | Upload a file (base64-encoded) so it can be used as source material in LLM flows. |
 | Attachments | `delete_attachment` | Permanently remove an attachment from the server by id. |
 | Database Sync | `list_database_syncs` | List the database syncs registered on a saved schema, with pending delta counts. |
-| Database Sync | `list_entity_states` | Browse the current entity state of a schema — the deduplicated, non-null-wins merged rows the entity layer holds (and every linked database mirrors), NOT the per-run records of… |
+| Database Sync | `list_entity_states` | Browse the current entity state of a schema — the deduplicated, last-write-wins merged rows the entity layer holds (and every linked database mirrors), NOT the per-run records of… |
 | Database Sync | `create_database_sync` | Connect a database to a saved schema — the opt-in that turns enrichments into relational SQL deltas the user applies to their own PostgreSQL/MySQL/SQLite with the ee-database CLI… |
 | Database Sync | `assign_sync_host` | Assign (or clear) the sync host that provisions a database sync in managed ee-database mode: the assigned host claims the credential, creates the physical database if missing and… |
 | Database Sync | `classify_database_model` | Re-run the database-model classification pass on a saved schema: an LLM proposes each property's SQL contract — database_key (identity), indexed (list-screen search/filter/sort… |
