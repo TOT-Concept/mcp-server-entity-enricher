@@ -85,13 +85,14 @@ Every enrichment response carries a `database` block — read it instead of gues
 
 | Field | Meaning |
 |---|---|
-| `status` | `saved`, `partial` (the entity landed but some rows were dropped), `rejected` |
+| `status` | `saved`, `partial` (the entity landed but some rows were dropped or references detached), `rejected` |
 | `reason` / `missing_fields` | The unfilled non-nullable path behind the rejection or each dropped item |
 | `entity_keys` | The **stored** key column values — correlate rows by these, not by your input text, which the model may canonicalize |
 | `key_collisions`, `shared_entity_conflicts`, `skipped_items` | Rows dropped or overwritten silently |
+| `detached_references` | Shared 1-1 references cut because the referenced entity was itself incomplete: the row is there, its foreign key is NULL, and the target was neither written nor updated |
 | `identity_merges` | Objects whose semantic ID resolved to a concept minted from *different* text. With an empty `json_path` it is the enriched entity itself: this run took over that row and overwrote it, so check the two texts really name the same thing |
 
-Nothing re-sends dropped rows: fix the schema, re-enrich. A `rejected` entity never reaches
+Nothing re-sends dropped rows or reattaches detached references: fix the schema, re-enrich. A `rejected` entity never reaches
 your database at all — waiting for its rows is waiting forever.
 
 ## 5. Verify
