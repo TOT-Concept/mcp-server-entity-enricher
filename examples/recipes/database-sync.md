@@ -30,7 +30,8 @@ Two decisions are cheap now and expensive later — both are made *before* the d
 
 `create_database_sync` returns the database id **and** a `classification_job_id`: registering
 starts an LLM pass that proposes each property's SQL contract — which property is the database
-key, which columns get indexed, what type each one becomes, which relationships are owned.
+key, which columns deserve an index (a filter column, or a coordinate/interval pair that
+becomes one spatial or range index), what type each one becomes, which relationships are owned.
 
 > Poll that classification job, then read the schema back and show me the proposed keys, types
 > and owned relationships.
