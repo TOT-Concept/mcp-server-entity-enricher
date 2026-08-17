@@ -200,7 +200,7 @@ Per-client setup and examples: [Claude Code](examples/claude-code/) · [claude.a
 | Database Sync | `list_entity_states` | Browse the current entity state of a schema — the deduplicated, last-write-wins merged rows the entity layer holds (and every linked database mirrors), NOT the per-run records of… |
 | Database Sync | `create_database_sync` | Connect a database to a saved schema — the opt-in that turns enrichments into relational SQL deltas the user applies to their own PostgreSQL/MySQL/SQLite with the ee-database CLI… |
 | Database Sync | `assign_sync_host` | Assign (or clear) the sync host that provisions a database sync in managed ee-database mode: the assigned host claims the credential, creates the physical database if missing and… |
-| Database Sync | `classify_database_model` | Re-run the database-model classification pass on a saved schema: an LLM proposes each property's SQL contract — database_key (identity), the index intent (list-screen filter columns, coordinate/interval pairs… |
+| Database Sync | `classify_database_model` | Re-run the database-model classification pass on a saved schema: an LLM proposes each property's SQL contract — database_key (identity), the index intent ('filter' for list-screen… |
 | Database Sync | `delete_database_sync` | Delete a database sync and its queued deltas. |
 | Database Sync | `create_database_credential` | (Re)issue the sync-client credential of a database sync — the pairing step of the ee-database CLI workflow. |
 | Database Sync | `fetch_database_deltas` | Fetch the next FIFO window of SQL deltas for a database sync. |
