@@ -167,15 +167,15 @@ Per-client setup and examples: [Claude Code](examples/claude-code/) · [claude.a
 | Schemas | `get_schema` | Fetch the full content of a saved schema by ID, including all properties, key fields, expertise domains, and validation rules. |
 | Schemas | `create_schema_from_sample` | Generate and auto-save a JSON schema whose paths and types strictly follow an approved sample. |
 | Schemas | `save_schema` | Persist a schema you authored directly (no LLM call, no cost) as a new saved schema. |
-| Schemas | `update_schema` | Update a saved schema without an LLM call: rename, replace the schema_content, change tags, pin/unpin, or toggle non-determinism analysis. |
+| Schemas | `update_schema` | Update a saved schema without an LLM call: rename, replace the schema_content, change tags, pin/unpin, or toggle the ambiguity check. |
 | Schemas | `get_schema_part` | Read a part of a saved schema without fetching the whole document. |
 | Schemas | `update_schema_property` | Edit ONE property of a saved schema's working copy by path — rename, change type or $ref, description, examples, flags — or remove it, without sending the full schema_content. |
 | Schemas | `add_schema_property` | Add a property to an object of a saved schema's working copy: a scalar, an inline nested object (optionally with sub-properties, or untyped to fill later), or a $ref to an… |
 | Schemas | `move_schema_property` | Move ONE property of a saved schema's working copy into another container — a $defs entity ('$defs.X'), an inline object (object path, trailing '[]' enters an array's item type),… |
 | Schemas | `publish_schema` | Publish a linked schema's working copy as its contract (publish model): enrichment and the linked database syncs follow the published content only, so structural edits (new… |
 | Schemas | `delete_schema` | Soft-delete a saved schema by ID (restorable server-side shortly after; permanent deletion stays in the web UI). |
-| Schemas | `analyze_sample` | Analyze a sample entity before schema generation: non-determinism and identity scoping, two parallel model calls behind one request. |
-| Schemas | `analyze_schema` | Analyze a saved schema with the same two checks as analyze_sample — non-determinism and identity scoping — and write the verdicts onto its properties. |
+| Schemas | `analyze_sample` | Analyze a sample entity before schema generation: ambiguity and identity scoping, two parallel model calls behind one request. |
+| Schemas | `analyze_schema` | Analyze a saved schema with the same two checks as analyze_sample — ambiguity and identity scoping — and write the verdicts onto its properties. |
 | Enrichment & fusion | `start_batch_enrichment` | Start an asynchronous batch enrichment against a JSON schema and return {job_id, total} immediately. |
 | Enrichment & fusion | `fetch_entities` | Fetch a JSON array of entities from an external REST API (GET), server-side — the input step before start_batch_enrichment. |
 | Enrichment & fusion | `enrich_entity` | Run a multi-model enrichment of a single entity against a JSON schema, returning the fused/best structured result. |
