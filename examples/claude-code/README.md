@@ -86,7 +86,7 @@ Two things to settle **before** generating, because retrofitting them means edit
 object by hand:
 
 - **Semantic IDs** (`generate_semantic_ids=true`) if this schema will ever feed a database —
-  without them, tables key on whatever `is_key` property generation happened to pick.
+  without them, tables key on whatever `identifying` property generation happened to pick.
 - **What is a scalar and what is its own object.** A value that names a real-world thing other
   records will also reference (a manufacturer, a laboratory, an author) is a free-text column
   as a string, and a table of its own — joinable, deduplicated — as a nested object. The sample

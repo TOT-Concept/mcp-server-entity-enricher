@@ -15,7 +15,7 @@ Two decisions are cheap now and expensive later — both are made *before* the d
 > then create a schema from them.
 
 - **Semantic IDs** (`generate_semantic_ids=true` on `create_schema_from_sample`) give every
-  object a stable, org-scoped identity. Without them each table keys on whatever `is_key`
+  object a stable, org-scoped identity. Without them each table keys on whatever `identifying`
   property generation happened to pick — a name, a website — which drifts between runs and
   mints duplicate rows. Retrofitting means hand-editing every object. They need an
   organization embedding model.
@@ -40,7 +40,7 @@ becomes one spatial or range index), what type each one becomes, which relations
 
 - a property whose proposed type cannot hold its own values (a year as text, a count as text);
 - a **shared** entity the pass stamped `owned` — the copy-per-parent trap above;
-- a declared `is_key` property demoted to something else.
+- a declared `identifying` property demoted to something else.
 
 Fix what's wrong with `update_schema` (no LLM call, no cost), or re-run the whole pass with
 `classify_database_model`.
