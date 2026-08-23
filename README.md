@@ -164,7 +164,7 @@ Per-client setup and examples: [Claude Code](examples/claude-code/) · [claude.a
 | Discovery | `list_models` | List the LLM models, languages, strategies, and (when the org has a plan with limits) the operational profile_limits available to the caller. |
 | Schemas | `generate_sample` | Generate a realistic sample entity JSON from an entity-type description — the entry point of the schema-authoring loop. |
 | Schemas | `list_schemas` | List saved JSON schemas in your organization, pinned ones first. |
-| Schemas | `get_schema` | Fetch the full content of a saved schema by ID, including all properties, key fields, expertise domains, and validation rules. |
+| Schemas | `get_schema` | Fetch the full content of a saved schema by ID, including all properties, identifying fields, expertise domains, and validation rules. |
 | Schemas | `create_schema_from_sample` | Generate and auto-save a JSON schema whose paths and types strictly follow an approved sample. |
 | Schemas | `save_schema` | Persist a schema you authored directly (no LLM call, no cost) as a new saved schema. |
 | Schemas | `update_schema` | Update a saved schema without an LLM call: rename, replace the schema_content, change tags, pin/unpin, or toggle the ambiguity check. |
