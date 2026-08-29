@@ -162,7 +162,7 @@ Per-client setup and examples: [Claude Code](examples/claude-code/) · [claude.a
 | Category | Tool | Description |
 |---|---|---|
 | Discovery | `list_models` | List the LLM models, languages, strategies, and (when the org has a plan with limits) the operational profile_limits available to the caller. |
-| Schemas | `generate_sample` | Generate a realistic sample entity JSON from an entity-type description — the entry point of the schema-authoring loop. |
+| Schemas | `generate_sample` | Generate a realistic sample entity JSON from a free-text request — the entry point of the schema-authoring loop. |
 | Schemas | `list_schemas` | List saved JSON schemas in your organization, pinned ones first. |
 | Schemas | `get_schema` | Fetch the full content of a saved schema by ID, including all properties, identifying fields, expertise domains, and validation rules. |
 | Schemas | `create_schema_from_sample` | Generate and auto-save a JSON schema whose paths and types strictly follow an approved sample. |
@@ -185,7 +185,7 @@ Per-client setup and examples: [Claude Code](examples/claude-code/) · [claude.a
 | Job control | `cancel_job` | Cancel a pending, running, or paused LLM job started by start_batch_enrichment, generate_sample, run_benchmark, or retry_expertises. |
 | Job control | `answer_job_question` | Answer the clarification questions of a paused job and resume it — the reply half of the interactive loop used by generate_sample's document-grounded planner (get_job_status… |
 | Records & stats | `list_records` | List past enrichment records in your organization, most recent first. |
-| Records & stats | `get_record` | Fetch a single enrichment record by ID, including the full structured output, validation errors, prompts/responses, and metrics. |
+| Records & stats | `get_record` | Fetch a single enrichment record by ID, including the full structured output, validation errors, per-expertise verdicts and metrics. |
 | Records & stats | `get_stats` | Aggregated statistics over your organization's enrichment records: totals, success rate, token usage, and cost summary. |
 | Benchmarks | `list_benchmark_scenarios` | List the organization's benchmark scenarios (saved, reusable enrichment tests: schema + entity + strategy + scoring config). |
 | Benchmarks | `get_benchmark_scenario` | Fetch one benchmark scenario with its per-model results (quality / cost / speed scores; results whose config_hash differs from the scenario's are stale — re-run those models). |
