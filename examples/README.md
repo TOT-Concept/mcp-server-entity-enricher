@@ -35,3 +35,5 @@ Copy-paste chat walkthroughs. They are client-agnostic: the prompts work in any 
 **Start here:** *Schema from sample* if you have nothing saved yet — every other recipe assumes
 a schema exists. Then *Database sync* if the results should live in your own database, because
 two of its decisions (semantic IDs, ownership) have to be made back in the schema.
+
+The recipe files are generated from the Markdown guides served by the MCP. Discover the complete guide list through `enricher://docs` or the [main README](../README.md#guides-and-tool-descriptions).

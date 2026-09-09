@@ -1,76 +1,25 @@
 # Entity Enricher MCP Server
 
-[![MCP](https://img.shields.io/badge/MCP-remote%20server-blue)](https://modelcontextprotocol.io)
-[![MCP Registry](https://img.shields.io/badge/MCP%20Registry-ai.entityenricher%2Fenricher-blue)](https://registry.modelcontextprotocol.io)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Website](https://img.shields.io/badge/entityenricher.ai-docs-orange)](https://entityenricher.ai/docs/integrations/mcp)
+A hosted [Model Context Protocol](https://modelcontextprotocol.io) server for
+[Entity Enricher](https://entityenricher.ai), available at
+`https://entityenricher.ai/api/mcp/` (Streamable HTTP).
 
-A **hosted, remote [Model Context Protocol](https://modelcontextprotocol.io) server** for
-[Entity Enricher](https://entityenricher.ai) — structured knowledge extraction with multiple
-LLM providers. Connect Claude Desktop, Claude Code, Cursor, claude.ai or any MCP-compatible
-client and, from inside a chat:
+From an MCP-compatible client you can:
 
-- **Author JSON schemas** — generate a sample entity, turn it into a schema, refine it in natural language.
-- **Enrich entities** — single or batch (up to 100), against your schemas, with any of your configured models.
-- **Enrich multilingually** — schemas with localized text fields get per-language values in every language you request, in one pass.
-- **Fuse multi-model results** — conflicts detected field-by-field, resolved by voting or LLM arbitration.
-- **Benchmark models on your own data** — saved scenarios, gold references, auto-scored quality / cost / speed.
-- **Ground enrichments in documents** — upload PDFs, images or audio and attach them to any flow.
-- **Land it all in your own database** — as real, migrated relational tables, synced by a client you run.
+- Design reusable schemas from sample data or documents and edit properties directly.
+- Enrich single entities or lists, with multilingual fields and multiple models.
+- Fuse results and recover failed expertise domains without repeating successful work.
+- Resolve recurring objects to semantic identities and curate their aliases or uncertain matches.
+- Derive relational tables and migrations for your PostgreSQL, MySQL or SQLite database.
+- Benchmark enrichment, sample generation and schema generation on your own tasks.
 
-No install, no local process: the server runs at `https://entityenricher.ai/api/mcp/`
-(streamable HTTP). This repository holds the public documentation and ready-to-use client
-configs; the server implementation lives in the Entity Enricher platform. (The one optional
-local binary is the database sync client below — and only if you want the rows in a database of
-your own.)
+Schema validation and model agreement do not establish factual truth or freshness.
+Inspect the actual sources, failures and partial outcomes. A successful generation,
+entity-layer admission and application on your external replica are distinct outcomes.
 
-### Enrichments become a real database — yours
-
-The enrichment is the easy half. What you normally end up building yourself — the tables to
-hold the results, the DDL, the migration when the shape changes, and a loader that keeps it
-consistent — is what a **database sync** does for you, and a chat is a good place to drive it:
-
-- **A designed schema, not a JSON dump.** `create_database_sync` connects a database to a saved
-  schema, and Entity Enricher derives the relational model from it: a table per entity type,
-  `PRIMARY KEY`s, real `FOREIGN KEY`s, child tables for the parts an entity owns, junction
-  tables for entities it merely references (one row many parents point at, not a copy per
-  parent), typed columns, and indexes on what a list screen actually filters and sorts on. An
-  LLM pass proposes each column's SQL contract — ask your client to read it back and fix what
-  it got wrong (`classify_database_model`, `update_schema`) before anything ships.
-- **Migrations you don't write.** `publish_schema` turns the working copy into the contract:
-  the change is diffed against what each database has actually shipped and travels down the
-  same feed as the data — additive DDL applied silently, riskier transforms (a re-key, a type
-  change, a renamed column) held for your confirmation. No hand-written `ALTER`, no drift.
-- **Synced by an open-source client you run.** `create_database_credential` issues the pairing
-  token for [`ee-database`](https://github.com/TOT-Concept/ee-database) — an MIT-licensed Go
-  binary that lives next to *your* PostgreSQL, MySQL or SQLite. It connects **outward** over
-  WSS and **your connection string never leaves the machine**: Entity Enricher never holds a
-  credential to your database. It bootstraps from a `.sql` snapshot, applies each leased batch
-  transactionally, acknowledges it, and halts loudly on a failing delta rather than skipping
-  it. Releases are **Sigstore-signed** and the installer verifies that signature against the
-  publishing workflow's identity before the binary is ever executable.
-
-```
-  your schema ──┬──▶ relational model   tables, PK/FK, child + junction tables, indexes
-                ├──▶ migrations         schema edits, diffed and shipped as DDL
-                └──▶ rows               every enrichment, merged into current state
-                             │
-                             │  one ordered feed, leased and acknowledged
-                             ▼
-                    ee-database  ──  MIT-licensed, Sigstore-signed, outbound WSS only
-                             │       (your DSN never leaves your machine)
-                             ▼
-              your PostgreSQL · MySQL · SQLite
-```
-
-A client that can run commands (Claude Code) carries the whole loop, install included; any
-other client walks you through it and you paste one line into a terminal. No replica at all?
-`list_entity_states` browses the same merged rows server-side, and `fetch_database_deltas` /
-`ack_database_deltas` let a client apply the feed itself. Walkthrough:
-[Database sync recipe](examples/recipes/database-sync.md).
-
-Listed on the [official MCP Registry](https://registry.modelcontextprotocol.io) as
-**`ai.entityenricher/enricher`** (see [server.json](server.json)).
+The MCP server needs no local installation. Optional database delivery uses
+[ee-database](https://github.com/TOT-Concept/ee-database) on your replica host; its DSN stays
+there. Managed hosts can provision automatically; manual pairing is also supported.
 
 ## Quickstart
 
@@ -138,21 +87,35 @@ Continue, Zed) — and for headless/CI use.
 > List my Entity Enricher schemas, then enrich "Sanofi" against the pharmaceutical company
 > schema in English and French.
 
-Claude discovers the tools automatically, confirms the model and schema choice with you, and
-returns the structured result inline.
+The client discovers the tools, reads the selected schema and returns the result with a link.
+Automatic model selection is available; consequential choices are reviewed when needed.
 
-## Examples & recipes
+## Guides and tool descriptions
 
-Client configs and copy-paste chat walkthroughs live in [examples/](examples/):
+Server instructions explain the workflows. Tool descriptions explain individual calls,
+including preconditions, costs and consequential effects. Detailed modeling, recovery and
+migration guidance is loaded only when needed.
 
-| Recipe | What it covers |
+Use MCP `resources/list` to discover the guide index (`enricher://docs`) and each guide,
+then `resources/read` on the desired URI. Guides do not run a model. Clients decide how
+resources enter model context; reading them is not guaranteed to be token-free.
+
+The following public recipes are generated from the **same packaged Markdown** the server
+serves. Edit the source guides in the main repository, not these generated copies.
+
+| Guide | MCP resource |
 |---|---|
-| [Schema from sample](examples/recipes/schema-from-sample.md) | generate a sample → schema → refine → first enrichment |
-| [Database sync](examples/recipes/database-sync.md) | schema → designed tables → publish → pair `ee-database` → migrations |
-| [Batch enrichment](examples/recipes/batch-enrichment.md) | entity lists, external APIs, async polling, partial-failure retry |
-| [Model benchmark](examples/recipes/model-benchmark.md) | scenarios, gold references, auto-scored model comparison |
+| [Schema from samples](examples/recipes/schema-from-sample.md) | `enricher://docs/schema-from-sample` |
+| [Schema format and editing](examples/recipes/schema-reference.md) | `enricher://docs/schema-reference` |
+| [Documents](examples/recipes/documents.md) | `enricher://docs/documents` |
+| [Enrichment, fusion and recovery](examples/recipes/enrichment-and-fusion.md) | `enricher://docs/enrichment-and-fusion` |
+| [Batch enrichment](examples/recipes/batch-enrichment.md) | `enricher://docs/batch-enrichment` |
+| [Benchmarks](examples/recipes/model-benchmark.md) | `enricher://docs/model-benchmark` |
+| [Database sync](examples/recipes/database-sync.md) | `enricher://docs/database-sync` |
+| [Semantic identities](examples/recipes/semantic-ids.md) | `enricher://docs/semantic-ids` |
 
-Per-client setup and examples: [Claude Code](examples/claude-code/) · [claude.ai](examples/claude-ai-remote.md) · [Claude Desktop](examples/claude-desktop/) · [Cursor](examples/cursor/mcp.json)
+If a client cannot read MCP resources, use these public links. The guides complement
+individual tool contracts; ordinary calls do not require reading them all.
 
 ## Tools
 
@@ -161,157 +124,107 @@ Per-client setup and examples: [Claude Code](examples/claude-code/) · [claude.a
 
 | Category | Tool | Description |
 |---|---|---|
-| Discovery | `list_models` | List the LLM models, languages, strategies, and (when the org has a plan with limits) the operational profile_limits available to the caller. |
-| Schemas | `generate_sample` | Generate a realistic sample entity JSON from a free-text request — the entry point of the schema-authoring loop. |
-| Schemas | `list_schemas` | List saved JSON schemas in your organization, pinned ones first. |
-| Schemas | `get_schema` | Fetch the full content of a saved schema by ID, including all properties, identifying fields, expertise domains, and validation rules. |
-| Schemas | `create_schema_from_sample` | Generate and auto-save a JSON schema whose paths and types strictly follow an approved sample. |
-| Schemas | `save_schema` | Persist a schema you authored directly (no LLM call, no cost) as a new saved schema. |
-| Schemas | `update_schema` | Update a saved schema without an LLM call: rename, replace the schema_content, change tags, pin/unpin, or toggle the ambiguity check. |
-| Schemas | `get_schema_part` | Read a part of a saved schema without fetching the whole document. |
-| Schemas | `get_enum_candidates` | Out-of-set values enrichment has returned for each OPEN enum of a saved schema (closed: false, the generation default), with counts — read from the schema's recent records at call… |
-| Schemas | `update_schema_property` | Edit ONE property of a saved schema's working copy by path — rename, change type or $ref, description, examples, flags — or remove it, without sending the full schema_content. |
-| Schemas | `add_schema_property` | Add a property to an object of a saved schema's working copy: a scalar, an inline nested object (optionally with sub-properties, or untyped to fill later), or a $ref to an… |
-| Schemas | `move_schema_property` | Move ONE property of a saved schema's working copy into another container — a $defs entity ('$defs.X'), an inline object (object path, trailing '[]' enters an array's item type),… |
-| Schemas | `resolve_unify_proposal` | Resolve ONE cross-site unification proposal on a saved schema (x-entityMap.proposals; issue #181). |
-| Schemas | `publish_schema` | Publish a linked schema's working copy as its contract (publish model): enrichment and the linked database syncs follow the published content only, so structural edits (new… |
-| Schemas | `delete_schema` | Soft-delete a saved schema by ID (restorable server-side shortly after; permanent deletion stays in the web UI). |
-| Schemas | `analyze_sample` | Analyze a sample entity before schema generation: ambiguity and identity scoping, two parallel model calls behind one request. |
-| Schemas | `analyze_schema` | Analyze a saved schema with the same two checks as analyze_sample — ambiguity and identity scoping — and write the verdicts onto its properties. |
-| Enrichment & fusion | `start_batch_enrichment` | Start an asynchronous batch enrichment against a JSON schema and return {job_id, total} immediately. |
-| Enrichment & fusion | `fetch_entities` | Fetch a JSON array of entities from an external REST API (GET), server-side — the input step before start_batch_enrichment. |
-| Enrichment & fusion | `enrich_entity` | Run a multi-model enrichment of a single entity against a JSON schema, returning the fused/best structured result. |
-| Enrichment & fusion | `retry_expertises` | Re-run only the FAILED expertise domains of an existing multi-expertise enrichment record, merging the recovered values back into the record — no re-payment for the domains that… |
-| Enrichment & fusion | `merge_records` | Merge 2+ enrichment records of the same entity into one fused result — the manual / re-run counterpart of the automatic fusion that follows a 2+ model enrich_entity or batch run. |
-| Job control | `get_job_status` | Poll the status of an asynchronous LLM job — the middle step of every start → poll → fetch flow (start_batch_enrichment, generate_sample, run_benchmark, retry_expertises). |
-| Job control | `cancel_job` | Cancel a pending, running, or paused LLM job started by start_batch_enrichment, generate_sample, run_benchmark, or retry_expertises. |
-| Job control | `answer_job_question` | Answer the clarification questions of a paused job and resume it — the reply half of the interactive loop used by generate_sample's document-grounded planner (get_job_status… |
-| Records & stats | `list_records` | List past enrichment records in your organization, most recent first. |
-| Records & stats | `get_record` | Fetch a single enrichment record by ID, including the full structured output, validation errors, per-expertise verdicts and metrics. |
-| Records & stats | `get_stats` | Aggregated statistics over your organization's enrichment records: totals, success rate, token usage, and cost summary. |
-| Benchmarks | `list_benchmark_scenarios` | List the organization's benchmark scenarios (saved, reusable enrichment tests: schema + entity + strategy + scoring config). |
-| Benchmarks | `get_benchmark_scenario` | Fetch one benchmark scenario with its per-model results (quality / cost / speed scores; results whose config_hash differs from the scenario's are stale — re-run those models). |
-| Benchmarks | `get_benchmark_scenario_results` | Filter, rank and cap a scenario's per-model results — the same rows get_benchmark_scenario returns, narrowed to what you asked for. |
-| Benchmarks | `create_benchmark_scenario` | Create a benchmark scenario — a reusable model test. |
-| Benchmarks | `update_benchmark_scenario` | Update a benchmark scenario. |
-| Benchmarks | `set_benchmark_reference` | Save a scenario's gold reference — the expected output each model result is scored against, and the gate between create_benchmark_scenario and run_benchmark. |
-| Benchmarks | `delete_benchmark_scenario` | Delete a benchmark scenario and its results. |
-| Benchmarks | `run_benchmark` | Launch a benchmark run — the final step of the benchmark lifecycle: execute the scenario's task (enrichment / sample generation / schema generation) with each selected model… |
-| Attachments | `upload_attachment` | Upload a file (base64-encoded) so it can be used as source material in LLM flows. |
-| Attachments | `delete_attachment` | Permanently remove an attachment from the server by id. |
-| Database Sync | `list_database_syncs` | List the database syncs registered on a saved schema, with pending delta counts. |
-| Database Sync | `list_entity_states` | Browse the current entity state of a schema — the deduplicated, last-write-wins merged rows the entity layer holds (and every linked database mirrors), NOT the per-run records of… |
-| Database Sync | `create_database_sync` | Connect a database to a saved schema — the opt-in that turns enrichments into relational SQL deltas the user applies to their own PostgreSQL/MySQL/SQLite with the ee-database CLI… |
-| Database Sync | `assign_sync_host` | Assign (or clear) the sync host that provisions a database sync in managed ee-database mode: the assigned host claims the credential, creates the physical database if missing and… |
-| Database Sync | `classify_database_model` | Re-run the database-model classification pass on a saved schema: an LLM proposes each property's SQL contract — database_key (identity), the index intent ('search' for text a… |
-| Database Sync | `delete_database_sync` | Delete a database sync and its queued deltas. |
-| Database Sync | `create_database_credential` | (Re)issue the sync-client credential of a database sync — the pairing step of the ee-database CLI workflow. |
-| Database Sync | `fetch_database_deltas` | Fetch the next FIFO window of SQL deltas for a database sync. |
-| Database Sync | `ack_database_deltas` | Acknowledge applied database deltas up to an id: releases the lease and, per the database's options, purges delivered copies and fully-delivered entity state. |
-| Database Sync | `sync_records_to_database` | Push already-stored enrichment output into the entity layer, so it reaches the schema's database sync. |
-| Semantic IDs | `list_semantic_concepts` | Browse your organization's semantic-ID vocabulary — the org-scoped concepts that near-duplicate objects resolve to and database syncs key on. |
-| Semantic IDs | `get_semantic_concept` | One concept in full: its surface-form aliases (the texts that resolve to it, one canonical), the identity source keys it was composed from, the records that resolved to it, and… |
-| Semantic IDs | `probe_semantic_concept` | Dry-run the resolution ladder for a text against one concept type — what an enrichment would do with it — without creating or bumping anything. |
-| Semantic IDs | `add_semantic_concept` | Add a concept to the vocabulary at usage 0 (editor role) — or, with alias_of, add the text as a new SURFACE FORM of that existing concept instead of a concept of its own. |
-| Semantic IDs | `update_concept_alias` | Manage one surface form (alias) of a concept (editor role): action='remove' prunes a captured variant so its text stops resolving to the concept — the group's LAST surface form is… |
-| Semantic IDs | `import_semantic_concepts` | Resolve a batch of identity texts (up to 1000) against one concept type through the same ladder an enrichment uses. |
-| Semantic IDs | `merge_semantic_concepts` | Fold one concept (the loser) into another (the winner) — the resolution of a duplicates-band pair. |
-| Semantic IDs | `delete_semantic_concepts` | Delete concepts by explicit ids, whole concept types, or every unused concept of a scope. |
-| Semantic IDs | `migrate_semantic_embeddings` | The org's embedding-model migration — the only sanctioned way to move existing concepts between embedding models. |
+| Discovery | `list_models` | List available model keys, nominal capabilities, languages, strategies, auto-selected defaults and organization profile_limits. |
+| Schemas | `generate_sample` | Generate editable sample JSON from a free-text request for schema authoring. |
+| Schemas | `list_schemas` | List saved schemas in your organization, pinned first. |
+| Schemas | `get_schema` | Read a saved schema with its properties, annotations and input_contract. |
+| Schemas | `create_schema_from_sample` | Generate and auto-save a schema from reviewed samples, returning schema_id, schema content and record links. |
+| Schemas | `save_schema` | Save a directly authored schema and return its ID and link. |
+| Schemas | `update_schema` | Edit a saved schema's metadata or replace its full schema_content without an LLM call. |
+| Schemas | `get_schema_part` | Read only the schema fragment needed for an edit. |
+| Schemas | `get_enum_candidates` | List observed values outside each open enum's current vocabulary, with counts from recent enrichment records. |
+| Schemas | `update_schema_property` | Edit or remove one property by path without replacing the full schema. |
+| Schemas | `add_schema_property` | Add a property under the root (parent_path=''), an object path or '$defs.X'. |
+| Schemas | `move_schema_property` | Move one property into the root, an object path or '$defs.X', preserving its flags and expertise. |
+| Schemas | `resolve_unify_proposal` | Resolve one pending entity-type unification proposal from get_schema. |
+| Schemas | `publish_schema` | Publish a database-linked schema's working copy as the contract used by enrichment and replicas. |
+| Schemas | `delete_schema` | Soft-delete a saved schema by UUID. |
+| Schemas | `analyze_sample` | Analyze sample property ambiguity and relationship identity scoping before schema generation. |
+| Schemas | `analyze_schema` | Analyze a saved schema's property ambiguity and relationship identity scoping, writing annotations to the schema. |
+| Enrichment & fusion | `start_batch_enrichment` | Start billed asynchronous enrichment of an entity list against exactly one of schema_id or target_schema. |
+| Enrichment & fusion | `fetch_entities` | Fetch entities from an external REST API using a server-side GET. |
+| Enrichment & fusion | `enrich_entity` | Enrich one entity against exactly one of schema_id or target_schema, returning structured output, record_id, costs and any database outcome. |
+| Enrichment & fusion | `retry_expertises` | Retry only an existing record's failed expertise domains, then update its output and attempt the run's fusion/synchronization. |
+| Enrichment & fusion | `merge_records` | Fuse two or more records of the same entity into a new arbitration record. |
+| Job control | `get_job_status` | Read a job's status, progress and compact terminal summary with persisted record IDs. |
+| Job control | `cancel_job` | Request cancellation of a pending, running or paused LLM job. |
+| Job control | `answer_job_question` | Resume a paused job with answers to the questions returned under pause. |
+| Records & stats | `list_records` | List compact, paginated records in your organization, most recent first. |
+| Records & stats | `get_record` | Read one persisted record's structured_output, entity_input_data, validation errors, expertise verdicts and metrics. |
+| Records & stats | `get_stats` | Read organization-wide record totals, success rate, tokens and cost summary. |
+| Benchmarks | `list_benchmark_scenarios` | List compact benchmark scenario summaries and total. |
+| Benchmarks | `get_benchmark_scenario` | Read one benchmark scenario with per-model quality, cost and speed results. |
+| Benchmarks | `get_benchmark_scenario_results` | Filter, rank and limit a scenario's per-model benchmark results. |
+| Benchmarks | `create_benchmark_scenario` | Create a reusable benchmark with a mandatory scoring judge. |
+| Benchmarks | `update_benchmark_scenario` | Edit a benchmark's test definition or scoring configuration. |
+| Benchmarks | `set_benchmark_reference` | Save the gold reference for an enrichment or schema-generation benchmark. |
+| Benchmarks | `delete_benchmark_scenario` | Delete a benchmark scenario and its stored results. |
+| Benchmarks | `run_benchmark` | Start billed asynchronous execution and scoring of a benchmark. |
+| Attachments | `upload_attachment` | Upload base64 file bytes as reusable source material; returns id and requires_capability. |
+| Attachments | `delete_attachment` | Permanently delete an attachment in your organization, including its stored file. |
+| Database Sync | `list_database_syncs` | List a saved schema's database registrations, linked schemas, options and sync hosts. |
+| Database Sync | `list_entity_states` | Browse a schema's current merged entity rows, not per-run records. |
+| Database Sync | `create_database_sync` | Register a saved schema for relational synchronization to PostgreSQL, MySQL or SQLite. |
+| Database Sync | `assign_sync_host` | Assign or clear the host provisioning a database sync. |
+| Database Sync | `classify_database_model` | Start a billed analysis proposing database keys, SQL types, indexes and relationship ownership on a linked schema. |
+| Database Sync | `delete_database_sync` | Delete a database registration and its queued deltas, stopping its feed. |
+| Database Sync | `create_database_credential` | Issue a one-time sync-client credential and install/pair/run command suggestions. |
+| Database Sync | `fetch_database_deltas` | Read the next ordered window of SQL deltas and canonical payloads for a database sync. |
+| Database Sync | `ack_database_deltas` | Acknowledge every delta through up_to_id after successful application, releasing its lease. |
+| Database Sync | `sync_records_to_database` | Validate and inject stored or supplied enrichment output into the entity layer and linked syncs. |
+| Semantic IDs | `list_semantic_concepts` | Browse organization concepts with aliases, usage counts and type/model facets. |
+| Semantic IDs | `get_semantic_concept` | Read one concept's aliases, identity source keys, linked records and nearest neighbors within its own type/model slice. |
+| Semantic IDs | `probe_semantic_concept` | Preview identity resolution without adding a concept or increasing its usage. |
+| Semantic IDs | `add_semantic_concept` | Add an identity concept at zero usage, or add text as an alias using alias_of. |
+| Semantic IDs | `update_concept_alias` | Remove or promote a concept alias using alias IDs from get_semantic_concept. |
+| Semantic IDs | `import_semantic_concepts` | Resolve 1..1000 texts against one concept type. |
+| Semantic IDs | `merge_semantic_concepts` | Merge a loser concept into a winner. |
+| Semantic IDs | `delete_semantic_concepts` | Delete concepts selected by ids, concept_types or unused_only. |
+| Semantic IDs | `migrate_semantic_embeddings` | Inspect or migrate the organization's concept embedding space. |
 <!-- TOOL_TABLE_END -->
 
-Tool behaviour is identical to the REST endpoints they wrap — same validation, billing and plan
-limits as the web app. Write tools require the **editor** role; benchmark tools require
-**owner** plus a plan that includes Model Benchmarks.
+Tool signatures are the callable contract. The wrappers share backend services, but do not
+expose every REST/UI option. Schema mutations require editor; benchmark mutations/runs
+require owner plus a benchmark-enabled plan. Database registration/credentials require
+owner plus a sync-enabled plan. See each tool for its requirements.
 
-### Resources
+## Data resources
 
-Resources let the client *browse* data without a tool call — both render as Markdown.
-
-| Resource | URI template |
+| Resource template | Meaning |
 |---|---|
-| Saved schema | `enricher://schemas/{schema_id}` |
-| Enrichment record | `enricher://records/{record_id}` |
+| `enricher://schemas/{schema_id}` | Schema working copy as Markdown. For a linked published contract use `get_schema(version="published")`. |
+| `enricher://records/{record_id}` | Output and metrics as Markdown; `get_record` adds expertise and database-delivery diagnostics. |
 
-## The async job pattern
+## Jobs and errors
 
-MCP tools can't stream, so long-running work is split into **start → poll → fetch**:
+Long-running work uses this server's start → poll → fetch interface. Start tools return a
+`job_id`; `generate_sample` can already be paused or completed when it returns. Poll
+`get_job_status`, answer paused questions through `answer_job_question`, and retrieve records
+by `list_records(job_id=...)`. A missing in-memory job is not proof of completion; check for
+persisted records. Cancellation does not undo earlier records or database writes.
 
-1. A start tool (`start_batch_enrichment`, `generate_sample`, `run_benchmark`,
-   `retry_expertises`) returns a `job_id` immediately.
-2. `get_job_status(job_id)` polls progress; paused jobs carry clarification questions that
-   `answer_job_question` resolves; `cancel_job` aborts.
-3. Persisted outputs are fetched with `list_records(job_id=…)` (or the feature's own read
-   tool, e.g. `get_benchmark_scenario`).
+Most failures return `success: false`, `error_code` and `message`; some older tools return
+only `error` or `message`. A successful MCP transport response does not imply successful
+work. Inspect classification warnings, failed model legs, and partial/rejected database
+outcomes even when an output is present. Detailed recovery is in the enrichment guide.
 
-Jobs are held in a bounded in-memory manager — an unknown `job_id` means the job finished long
-ago; go straight to the records.
+## Scope and limitations
 
-## Interactive classification resume
-
-The feature that only an interactive client unlocks. With a classification model enabled, a
-pre-flight check verifies the entity matches the schema type. On a mismatch the tool returns a
-**non-error** response instead of failing:
-
-```json
-{
-  "success": false,
-  "error_code": "classification_warning",
-  "message": "Pre-flight classification rejected the entity. ...",
-  "classification": {
-    "status": "mismatch",
-    "reasoning": "Titan is a moon of Saturn, not a planet.",
-    "confidence": 0.97
-  },
-  "job_id": "..."
-}
-```
-
-Claude surfaces the reasoning, asks you to confirm, and retries with
-`force_after_classification_warning=true`. Workflow connectors (n8n, Make) have to auto-cancel
-here — a chat can just ask.
-
-## Error codes
-
-Errors are structured dicts with an `error_code` field the client can pattern-match on:
-
-| `error_code` | When |
-|---|---|
-| `invalid_request` | Malformed UUID, mutually exclusive args, body validation failure. |
-| `prompt_limit_reached` | Daily/weekly/monthly prompt quota exhausted (HTTP 402), with period + usage details. |
-| `insufficient_credits` | Credit balance too low to start the job (HTTP 402), with balance + purchase URL. |
-| `model_limit_exceeded` / `language_limit_exceeded` | More models/languages requested than the plan allows (HTTP 402). |
-| `concurrent_job_limit_reached` | Too many active jobs for the org — wait or upgrade. |
-| `classification_warning` | ⚡ Non-error: pre-flight classifier rejected the entity (see above). |
-| `benchmarks_not_in_plan` | Benchmark tools need the owner role + a plan with Model Benchmarks (HTTP 403). |
-| `enrichment_timeout` / `schema_generation_timeout` | Job exceeded its timeout — try fewer models. |
-| `schema_generation_failed` | Upstream LLM error (HTTP 502). |
-| `cancelled` | Job cancelled mid-run (HTTP 499). |
-| `not_found` | Schema or record ID doesn't exist in your org. |
-
-## Authentication details
-
-- **OAuth 2.1 (recommended)** — any MCP client implementing the standard auth spec (claude.ai,
-  Claude Code, Cursor, MCP Inspector) discovers it automatically: standard discovery via
-  `/.well-known/oauth-protected-resource`, dynamic client registration, PKCE, browser consent.
-  No key to create or paste. Tokens are audience-bound and instantly revocable under
-  **Settings → API Keys → Connected Apps**.
-- **X-API-Key** — for clients configured via a static JSON file: `ent_…` organization access
-  keys, created in Settings → API Keys. The role attached to the key (operator / editor /
-  owner) gates which tools succeed.
+- The MCP single/batch enrichment tools do not expose web-search activation; sample generation does.
+- Batch enrichment has no fixed 100-entity cap, but live quotas/credits can stop remaining work.
+- The batch tool has no `database_sync=false` option; the single-entity tool does.
+- Record deletion/restoration, detailed cost analytics, benchmark result import/export and some database administration remain in the web app or REST API.
+- Schema documents use the supported JSON Schema dialect with Entity Enricher annotations; see the schema reference before authoring one directly.
 
 ## Links
 
-- [Entity Enricher](https://entityenricher.ai) — the platform.
-- [MCP server docs](https://entityenricher.ai/docs/integrations/mcp) — the always-current web version of this guide.
-- [REST API reference](https://entityenricher.ai/docs/api) — the endpoints these tools wrap.
-- [Model Context Protocol](https://modelcontextprotocol.io) — the open spec.
+- [Public MCP documentation](https://entityenricher.ai/docs/integrations/mcp)
+- [REST API reference](https://entityenricher.ai/docs/api)
+- [Client configurations](examples/)
+- [MCP Registry](https://registry.modelcontextprotocol.io) — `ai.entityenricher/enricher`; manifest: [server.json](server.json)
 
 ## About this repository
 
-This repo contains the public documentation and client examples for the Entity Enricher MCP
-server. The server itself is embedded in the Entity Enricher platform and maintained in the
-main (private) monorepo; this repo is synced from it as a git subtree. Issues and discussions
-are welcome here.
-
-Licensed under the [MIT License](LICENSE).
+This public repository contains documentation and client examples. The server is embedded in
+the Entity Enricher backend and maintained in the private monorepo; this directory is synced
+as a git subtree. Licensed under the [MIT License](LICENSE).

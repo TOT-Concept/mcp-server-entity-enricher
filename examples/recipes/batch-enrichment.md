@@ -1,51 +1,27 @@
-# Recipe: batch-enrich a list of entities
+<!-- Generated from the packaged MCP guide; do not edit this copy. -->
 
-Goal: enrich up to 100 entities in one asynchronous job, with automatic per-entity fusion when
-you pick 2+ models, then pull the results back into the chat.
+# Batch enrichment
 
-## 1. Pick a schema
+Enrich an entity list asynchronously and distinguish skipped, failed, fused and database-admitted results.
 
-> Which Entity Enricher schemas do I have for companies?
+## Input and settings
 
-`list_schemas` returns compact summaries, pinned schemas first. Grab the `schema_id`.
+Supply entities directly, derive them from existing records, or use `fetch_entities` for a server-side REST GET. The fetch tool unwraps arrays under common wrapper keys and truncates to `max_entities` for response size; `total` is the pre-truncation count. It does not walk source pagination, and the truncation happens after fetching. If the source has more pages, obtain them separately. Treat credentials as credentials, not entity fields.
 
-## 2. Get the entities
+Read the schema and its `input_contract` before constructing each entity. Use the published document for a linked schema. All preserve paths and keys for supplied array items are required; identifying names are guidance. Call `start_batch_enrichment` with exactly one of `schema_id` or `target_schema`. Omitted models use the task's automatic single-model selection; explicit multiple models enable per-entity fusion when all succeed.
 
-Three common sources:
+There is no fixed 100-entity cap. Live organization prompt quotas and credits are checked as work advances, including concurrent consumption. Exhaustion can skip the remaining entities. Batches incur normal model costs. Attachments are applied to **every** entity: they are not paired with individual entries. The MCP batch tool exposes neither web-search activation nor `database_sync=false`. For per-entity source lists or opt-out, use individual calls or an appropriate REST/UI flow.
 
-- **Paste them** — "enrich these 20 company names: …". Claude builds the entity list itself.
-- **From an external API** — `fetch_entities` performs a server-side GET of a JSON array from
-  any REST endpoint (bearer / api_key / basic auth), so a CRM export URL works directly.
-- **From past records** — `list_records` + a filter, when re-enriching.
+## Start, poll and inspect
 
-## 3. Start the batch
+`start_batch_enrichment` returns `job_id` and `total`. Poll `get_job_status` using the entity counters: on batch jobs, `total_models` means models per entity and `completed_models` is not maintained. Batch classification never pauses. A confident mismatch skips that entity with `classification_mismatch`; softer verdicts become prompt context. One entity's failure does not imply all others failed.
 
-> Batch-enrich them against the company schema with GPT-5 and Claude Sonnet, English + German.
+Terminal summaries include entity outcomes and `db_saved`, `db_partial`, `db_rejected` counts. Use `include_result=true` for per-entity details and persisted IDs. Fetch records through `list_records(job_id=...)`, paging through all results, and use `get_record` selectively. One entity may have multiple model records and an arbitration record; a count of records is not a count of enriched entities. An entity skipped before persistence may appear only in the terminal outcome.
 
-`start_batch_enrichment` validates plan limits up front and returns `{job_id, total}`
-immediately. Per-entity pipelines run in parallel server-side; entities that fail don't block
-the rest.
+An unknown job is unavailable from the in-memory manager, not proof of success. Check persisted records for that ID. `cancel_job` stops remaining work cooperatively; in-flight calls and their records may complete, and earlier database writes remain.
 
-Plan-limit errors are structured — `model_limit_exceeded`, `language_limit_exceeded`,
-`concurrent_job_limit_reached`, `insufficient_credits` (HTTP 402) all carry quota details so
-Claude can tell you exactly what to reduce (or link you to the billing page).
+## Partial failures and delivery
 
-## 4. Poll
+Automatic fusion and database admission require all selected models of an entity to succeed. If one fails, the surviving record is not a fused result. Recover failed expertise domains on their own record with `retry_expertises`. If a leg left no record, run only that missing model through `enrich_entity(database_sync=false)` and manually `merge_records` with the survivor. See [Enrichment and fusion](enrichment-and-fusion.md).
 
-> How is the batch doing?
-
-`get_job_status(job_id)` returns progress counters (completed / failed / total). Jobs live in
-a bounded in-memory manager: an **unknown `job_id` means the job finished long ago** — skip
-straight to step 5.
-
-## 5. Fetch the results
-
-> Show me the results, failures first.
-
-`list_records(job_id=…)` is the fetch step of every async flow. Then `get_record` for any
-record worth a closer look. If some entities failed on specific expertise domains only,
-`retry_expertises` re-runs just the failed domains — you don't pay again for what succeeded.
-
-## Cancel
-
-`cancel_job(job_id)` stops a pending/running batch; already-persisted records stay.
+Database counts describe admission, not proof of replica application. Report partial/rejected outcomes and inspect the affected record's delivery state. A zero pending count does not exclude quarantined changes. The current server-side rows are available through `list_entity_states`; external delivery is covered in [Database sync](database-sync.md).
