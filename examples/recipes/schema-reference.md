@@ -35,6 +35,8 @@ Internally the model has a `root` envelope, entity `name`, `$enums` and `experti
 
 Nullable scalar properties serialize as a type array including `null`; nullable references use `anyOf` with a null branch. Multilingual text becomes a reference to a generated language-map definition. Do not manually construct per-language sample objects to request translations.
 
+**Unknown keywords are dropped, not rejected.** A conformant reader ignores keywords it does not know, so a full-document write (`save_schema`, `update_schema`) never fails on one — it reports them instead: `ignored_keywords` lists every dropped keyword with the node `path` (`''` = document root, `$defs.Type`, `players[].name`) and a `hint` naming the level it is read at, and `applied_repairs` carries the summary line. Read it after every write. The typical miss is a **property flag placed on an object**: `semantic_id`, `semantic_concept_type` and `semantic_source_keys` on a `$defs` entity configure nothing — they belong on the property inside that entity that carries the id. Standard keywords this dialect does not read are reported too (`required` is derived from nullability, an inline `enum` must be an `x-enums` vocabulary, combinators other than the nullable `anyOf` are dropped).
+
 ## Behavioral flags
 
 | Flag used by property tools | Effect |
@@ -49,7 +51,7 @@ Nullable scalar properties serialize as a type array including `null`; nullable 
 | `database_key`, `db_type`, `db_type_length`, `index`, `unique_group` | Relational identity, SQL typing and indexing. |
 | `shared`, `ordered` | Relationship ownership and array order semantics. |
 
-Not every flag is freely mutable through the property tool; its `flags` description lists accepted updates. Identity-source changes can require a full schema edit. Server validation may reject or normalize illegal combinations; inspect `applied_repairs`. A missing `preserve` field must not be invented. If a field is supposed to be researched, reconsider whether `preserve` belongs on it.
+Not every flag is freely mutable through the property tool; its `flags` description lists accepted updates. Identity-source changes can require a full schema edit. Server validation may reject or normalize illegal combinations; inspect `applied_repairs`, and `ignored_keywords` on full-document writes. A missing `preserve` field must not be invented. If a field is supposed to be researched, reconsider whether `preserve` belongs on it.
 
 ## Read the correct version
 
