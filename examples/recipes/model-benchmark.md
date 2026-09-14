@@ -12,13 +12,13 @@ Creating, editing, deleting or running benchmarks requires owner and a plan with
 |---|---|---|
 | `enrichment` | `schema_id` and fixed `entity_data` | Verified expected entity output. |
 | `sample_generation` | `sample_request` | None: rubric-scored by the judge. |
-| `schema_generation` | `sample_json` | Verified generated schema document. |
+| `schema_generation` | `entity_samples` (1..20 samples of one entity type) | Verified generated schema document, drafted from the same samples. |
 
 Use sample naming/language/search options where exposed; enrichment output languages are separate. Schema generation can opt into semantic IDs. `scenario_type` is immutable. On update, `sample_params` and `schema_gen_params` replace the whole parameter object; preserve settings you intend to retain. The judge can be changed but never cleared. Changing the test definition marks previous results stale.
 
 ## Verify references
 
-For enrichment, a strong model and source documents can help draft expected output, but model output alone is not a verified reference. Check values against trusted evidence or obtain human sign-off before `set_benchmark_reference(reference_verified=true)`. Schema-generation references must parse as the supported schema document; inspect structure and annotations as well as JSON syntax. `get_benchmark_scenario(include_reference=true)` returns the stored reference and fixed entity input for review.
+For enrichment, a strong model and source documents can help draft expected output, but model output alone is not a verified reference. Check values against trusted evidence or obtain human sign-off before `set_benchmark_reference(reference_verified=true)`. Schema-generation references must parse as the supported schema document; inspect structure and annotations as well as JSON syntax. `get_benchmark_scenario(include_reference=true)` returns the stored reference and fixed inputs (`entity_data`, or the schema-generation `entity_samples`) for review. Schema-generation scoring reads those samples as evidence — types, nullability and identity key sets the samples prove are settled without the judge — and reports `suggestions` on each result where a candidate schema looked better than the reference, so the reference can be improved by its author.
 
 Do not call `set_benchmark_reference` for sample-generation scenarios: the tool rejects them. They are runnable without a gold reference, but still need a scoring judge.
 
