@@ -137,7 +137,7 @@ individual tool contracts; ordinary calls do not require reading them all.
 | Schemas | `add_schema_property` | Add a property under the root (parent_path=''), an object path or '$defs.X'. |
 | Schemas | `move_schema_property` | Move one property into the root, an object path or '$defs.X', preserving its flags and expertise. |
 | Schemas | `resolve_unify_proposal` | Resolve one pending entity-type unification proposal from get_schema. |
-| Schemas | `nest_schema_region` | Nest a flat entity region from get_schema's x-entityMap into a subobject of the object holding its fields: the region's flat members (e.g. product_id, product_name on an order… |
+| Schemas | `nest_schema_region` | Materialize an entity region from get_schema's x-entityMap. |
 | Schemas | `publish_schema` | Publish a database-linked schema's working copy as the contract used by enrichment and replicas. |
 | Schemas | `delete_schema` | Soft-delete a saved schema by UUID. |
 | Schemas | `analyze_sample` | Analyze sample property ambiguity and relationship identity scoping before schema generation. |
