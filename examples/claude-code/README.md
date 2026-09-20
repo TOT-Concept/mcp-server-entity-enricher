@@ -173,8 +173,9 @@ No replica yet? `list_entity_states` browses the same merged rows server-side.
 
 `start_batch_enrichment` returns `{job_id, total}` immediately — Claude polls `get_job_status`
 until a terminal status and reads the outputs with `list_records(job_id=…)`. Ask for the
-failures explicitly: a per-entity `error_code` (`model_retired`, `rate_limited`, `provider_credits_exhausted`,
-`context_length_exceeded`, `provider_timeout`) says whether retrying is worth it.
+failures explicitly: a per-entity `error_code` (`model_retired`, `rate_limited`, `insufficient_credits` — the
+organization's own balance ran out, add credits — `provider_credits_exhausted`, `context_length_exceeded`,
+`provider_timeout`) says whether retrying is worth it.
 
 Depth: [recipes/batch-enrichment.md](../recipes/batch-enrichment.md).
 
