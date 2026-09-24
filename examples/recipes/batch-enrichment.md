@@ -6,7 +6,7 @@ Enrich an entity list asynchronously and distinguish skipped, failed, fused and 
 
 ## Input and settings
 
-Supply entities directly, derive them from existing records, or use `fetch_entities` for a server-side REST GET. The fetch tool unwraps arrays under common wrapper keys and truncates to `max_entities` for response size; `total` is the pre-truncation count. It does not walk source pagination, and the truncation happens after fetching. If the source has more pages, obtain them separately. Treat credentials as credentials, not entity fields.
+Supply entities directly or derive them from existing records. If the source is an external API, fetch and review the entities outside Entity Enricher, then pass only the entity objects to `start_batch_enrichment`; never put source credentials in entity fields or MCP arguments.
 
 Read the schema and its `input_contract` before constructing each entity. Use the published document for a linked schema. All preserve paths and keys for supplied array items are required; identifying names are guidance. Call `start_batch_enrichment` with exactly one of `schema_id` or `target_schema`. Omitted models use the task's automatic single-model selection; explicit multiple models enable per-entity fusion when all succeed.
 
