@@ -169,7 +169,7 @@ individual tool contracts; ordinary calls do not require reading them all.
 | Database Sync | `assign_sync_host` | Assign or clear the host provisioning a database sync. |
 | Database Sync | `classify_database_model` | Start a billed analysis proposing database keys, SQL types, indexes and relationship ownership on a linked schema. |
 | Database Sync | `delete_database_sync` | Delete a database registration and its queued deltas, stopping its feed. |
-| Database Sync | `create_database_credential` | Issue a one-time sync-client credential and install/pair/run command suggestions. |
+| Database Sync | `get_database_setup_instructions` | Return non-secret install, browser-confirmed pairing and run instructions for an ee-database sync client. |
 | Database Sync | `fetch_database_deltas` | Read the next ordered window of SQL deltas and canonical payloads for a database sync. |
 | Database Sync | `ack_database_deltas` | Acknowledge every delta through up_to_id after successful application, releasing its lease. |
 | Database Sync | `sync_records_to_database` | Validate and inject stored or supplied enrichment output into the entity layer and linked syncs. |

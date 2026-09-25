@@ -136,15 +136,16 @@ DDL and starts the feed. Later structural edits publish the same way, and ship a
 or a confirmed transform migration — you never hand-write an `ALTER`.
 
 ```
-> Issue a sync credential and set the client up against my local Postgres.
+> Give me the browser-confirmed setup instructions for my local Postgres sync client.
 ```
 
-`create_database_credential` returns the pairing token; Claude runs the client for you (it will
-ask before each command):
+`get_database_setup_instructions` returns non-secret commands. Claude runs the client for you
+(it will ask before each command), and the user confirms the database in the browser. The
+credential travels directly to the polling CLI:
 
 ```bash
 curl -fsSL https://entityenricher.ai/install-eedatabase.sh | sh
-ee-database pair --server https://entityenricher.ai <refresh-token>
+ee-database pair --server https://entityenricher.ai
 ee-database run --dsn "postgres://me:secret@localhost:5432/catalogue" --create-missing
 ```
 

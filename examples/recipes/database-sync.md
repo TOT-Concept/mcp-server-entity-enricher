@@ -18,6 +18,8 @@ Owned child arrays replace previous membership: a child omitted by a later answe
 
 Registration links the schema **unpublished** and normally starts a billed database-model classification job. Poll `classification_job_id`, or inspect `classification_skipped`. A skipped or failed pass leaves relationship sites without a `shared` verdict, and `publish_schema` refuses until every site has one: re-run `classify_database_model`, or set `shared` with `update_schema_property`. Then read `get_schema`'s working copy: review keys, ownership, SQL types, search intent and entity-level indexes. `classify_database_model` is incremental after relevant edits, not a forced full rerun of unchanged fields. Correct proposals with property tools.
 
+The MCP registration response never returns the database webhook signing secret. Configure, reveal or rotate webhook credentials in the web app instead.
+
 Review `registration_notices` and `custody_warning` before publication. Defaults commit to choices even when omitted:
 
 | Option | Consequence |
@@ -37,7 +39,7 @@ Use `publish_schema(validate_only=true)` to inspect blockers, warnings and exact
 
 Registration may assign one connected managed host automatically; `target_host` chooses explicitly. With several candidates use `assign_sync_host` after choosing. A managed host can provision the physical database and start syncing. Moving hosts revokes the old host credential, but does not evict a manual pairing.
 
-Without managed provisioning, use `create_database_credential` and its returned install/pair/run commands on the intended replica host. Reissuing revokes an existing credential and disconnects that client. The returned token is shown once. The client bootstraps from a snapshot, then consumes ordered changes; use its returned command suggestions rather than inventing paths or secrets.
+Without managed provisioning, use `get_database_setup_instructions` and run its install/pair/run commands on the intended replica host. Pairing opens the browser confirmation page: the owner chooses the database, and the credential travels directly to the polling CLI rather than through the MCP client. Confirming a new pairing replaces that database's previous credential and disconnects its prior client. The client bootstraps from a snapshot, then consumes ordered changes; use the returned command suggestions rather than inventing paths or secrets.
 
 ## Read the real outcome
 
