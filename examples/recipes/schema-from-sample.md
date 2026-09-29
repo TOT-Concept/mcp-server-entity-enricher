@@ -6,7 +6,7 @@ Design a reusable schema from reviewed examples, including identity, relationshi
 
 ## Choose the entry point
 
-If you already have representative JSON instances, pass them to `create_schema_from_sample` as `entity_samples`. If you already have a schema, use `save_schema`; a sample instance and a schema document are different inputs. Otherwise use `generate_sample` to design examples from a request or uploaded sources. Schema authoring requires the editor role. Generation and analysis incur model costs; mechanical edits do not call a model.
+If you already have representative JSON instances, pass them to `create_schema_from_sample` as `entity_samples`; a flat table (a spreadsheet or .csv file) goes as text in `samples_csv` instead — see below. If you already have a schema, use `save_schema`; a sample instance and a schema document are different inputs. Otherwise use `generate_sample` to design examples from a request or uploaded sources. Schema authoring requires the editor role. Generation and analysis incur model costs; mechanical edits do not call a model.
 
 ## Generate representative samples
 
@@ -29,6 +29,8 @@ Optional `analyze_sample` reports ambiguous or unmappable names, missing unit/pe
 ## Generate and inspect
 
 Call `create_schema_from_sample` with one or more `entity_samples`, a successful `sample_record_id`, or both. Explicit samples replace the stored samples; omitted `attachment_ids` inherit the record's sources, while `[]` deliberately removes them. The schema covers the union of observed fields; missing or null observations make fields nullable. Use consistent field names, including across items of an array; completely disjoint item fields are rejected.
+
+`samples_csv` takes CSV text whose first row is ALWAYS the header and whose data rows are the samples; never pass it together with `entity_samples`. The delimiter is `,`, `;` or tab. Headers become identifier keys (`Author Name` → `author_name`, diacritics folded). Each column gets one type read over every row — integer, number, boolean or text — an empty cell is null, and decimal commas (`8,99`) are read as numbers in `;`- or tab-separated text. A leading zero or an integer too long to keep exact keeps the column as text, and so do unit-bearing cells, which generation canonicalizes itself. Over 20 rows, 20 are kept, pulling in a later row for any column the first rows leave empty. A text that is not such a table is refused with an `error_code` naming the fault (`csv_header_is_value` when the first row holds data, `csv_header_missing`, `csv_header_duplicate`, `csv_row_too_wide`, `csv_not_tabular`); a missing header row is never guessed. Relay the result's `csv_import` (rows kept of the total, renamed headers) to the user.
 
 Decide `generate_semantic_ids` before generation when repeated entities need resolution across runs. It requires an organization embedding model and adds embedding cost; obtain agreement unless already authorized. Stable machine identifiers can also make good database keys. Human labels may vary and create duplicate rows; semantic resolution can itself make wrong matches, so inspect its warnings. Retrofitting semantic IDs requires regenerating or editing the relevant objects.
 
