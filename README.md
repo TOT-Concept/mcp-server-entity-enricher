@@ -6,7 +6,7 @@ A hosted [Model Context Protocol](https://modelcontextprotocol.io) server for
 
 From an MCP-compatible client you can:
 
-- Run any job on your client's own model (`delegate_llm_calls=true`): no platform model call, no credits.
+- Run any job on your client's own model, the default: no platform model call, no credits (`use_platform_models=true` opts out).
 - Design reusable schemas from sample data or documents and edit properties directly.
 - Enrich single entities or lists, with multilingual fields and multiple models.
 - Fuse results and recover failed expertise domains without repeating successful work.
@@ -24,13 +24,17 @@ there. Managed hosts can provision automatically; manual pairing is also support
 
 ## Run jobs on your own model
 
-Every start tool accepts `delegate_llm_calls=true`. The job then makes no platform model call
-and spends no credits: the model behind your MCP client answers every model call of the job,
-and the platform keeps building the prompts, enforcing the output schema, validating and
-normalizing each answer, saving the records and syncing the databases.
+By default every start tool runs its job on your own model: the job makes no platform model
+call and spends no credits — the model behind your MCP client answers every model call of the
+job, and the platform keeps building the prompts, enforcing the output schema, validating and
+normalizing each answer, saving the records and syncing the databases. `use_platform_models=true`
+runs the job on the platform's billed models instead, on the organization's benchmark-best model
+for the task (the result's `model_selection` says which and why); name a platform model only when
+the user named one.
 
-1. Start the job with `delegate_llm_calls=true` and no explicit model (omitted or `auto`,
-   otherwise `delegation_requires_auto`). It pauses as soon as its first model call is ready.
+1. Start the job with no explicit model (omitted or `auto`), deciding `enable_web_search` where
+   the tool takes it (omitted returns `web_search_undecided`: ask the user first). It pauses as
+   soon as its first model call is ready.
 2. Read `llm_requests` on `get_job_status`: each entry is one model call in MCP
    `sampling/createMessage` shape (system prompt, messages, tools, toolChoice) with a `purpose`
    naming the step and an `expires_at` deadline. Binary attachments are referenced as
@@ -41,8 +45,8 @@ normalizing each answer, saving the records and syncing the databases.
 4. Repeat until the job completes. Records are stamped with the model key `mcp::client` at
    zero cost; an unanswered request fails the job after fifteen minutes (`llm_request_timeout`).
 
-The plan must include the feature (`llm_delegation_not_in_plan`). Protocol details and edge
-cases — concurrent requests, repair requests on enrichment, attachments, timeouts — are in the
+Protocol details and edge cases — the opt-out onto platform models, the web-search decision,
+concurrent requests, repair requests on enrichment, attachments, timeouts — are in the
 [delegated LLM calls](examples/recipes/llm-delegation.md) guide.
 
 ## Quickstart
@@ -174,7 +178,7 @@ individual tool contracts; ordinary calls do not require reading them all.
 | Job control | `get_job_status` | Read a job's status, progress and compact terminal summary with persisted record IDs. |
 | Job control | `cancel_job` | Request cancellation of a pending, running or paused LLM job. |
 | Job control | `answer_job_question` | Resume a paused job with answers to the questions returned under pause. |
-| Job control | `answer_llm_request` | Answer one LLM request of a job started with delegate_llm_calls=true: you are its model. |
+| Job control | `answer_llm_request` | Answer one LLM request of a job running on your model (every start tool's default unless use_platform_models=true or an explicit platform model): you are its model. |
 | Records & stats | `list_records` | List compact, paginated records in your organization, most recent first. |
 | Records & stats | `get_record` | Read one persisted record's structured_output, entity_input_data, validation errors, expertise verdicts and metrics. |
 | Records & stats | `get_stats` | Read organization-wide record totals, success rate, tokens and cost summary. |
@@ -231,7 +235,7 @@ Long-running work uses this server's start → poll → fetch interface. Start t
 by `list_records(job_id=...)`. A missing in-memory job is not proof of completion; check for
 persisted records. Cancellation does not undo earlier records or database writes.
 
-A job started with `delegate_llm_calls=true` pauses on `llm_requests` instead of questions;
+A job running on your model (the default) pauses on `llm_requests` as well as on questions;
 see [Run jobs on your own model](#run-jobs-on-your-own-model).
 
 Most failures return `success: false`, `error_code` and `message`; some older tools return
