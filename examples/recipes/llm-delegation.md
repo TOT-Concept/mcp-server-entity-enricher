@@ -36,9 +36,11 @@ Record as a product finding, not as your own mistake: a rejection whose error do
 
 ## Attachments
 
-Text-extracted documents (DOCX, XLSX, PPTX, HTML, CSV, TXT, Markdown…) are already inside `messages`, exactly as a platform model receives them. Binary documents (PDF, images, audio) are never inlined: the request lists them under `attachments` with `attachment_id`, `filename`, `media_type`, `size_bytes`, `sha256`, `delivery: "resource"` and a `uri` — `enricher://attachments/{attachment_id}`, an MCP resource serving the bytes with their real media type. Read it once with `resources/read` and reuse it: the list is **identical for every request of the job**, and the bytes behind an id never change. The messages name each binary with a placeholder pointing at its `attachments[i]` entry.
+Text-extracted documents (DOCX, XLSX, PPTX, HTML, CSV, TXT, Markdown…) are already inside `messages`, exactly as a platform model receives them. Binary documents (PDF, images, audio) are never inlined: the request lists them under `attachments` with `attachment_id`, `filename`, `media_type`, `size_bytes`, `sha256`, `delivery: "resource"` and a `uri` — `enricher://attachments/{attachment_id}`, an MCP resource serving the bytes with their real media type. The messages name each binary with a placeholder pointing at its `attachments[i]` entry, and the list is **identical for every request of the job**.
 
-Documents you hold on your own side (a page from your own connectors, a file in your context) need nothing from the platform: answer from what you have. The platform cannot list or verify such sources, so say so when you report evidence.
+**Read your own copy.** A file you uploaded with `upload_attachment` is a file you hold: read it on your side, in whatever format it is, and answer from it — `filename` and `sha256` tell you which one. An attachment is therefore never a reason to start a job with `use_platform_models=true`, nor to replace a PDF with a text extraction of your own. The `uri` is for a file you do not hold (one a colleague uploaded from the web app): read it once with `resources/read` and reuse it — the bytes behind an id never change.
+
+Other documents you hold on your own side (a page from your own connectors, a file in your context that was never uploaded) need nothing from the platform either: answer from what you have. The platform cannot list or verify such sources, so say so when you report evidence.
 
 ## Timeouts and the job status
 
