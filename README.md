@@ -179,7 +179,7 @@ individual tool contracts; ordinary calls do not require reading them all.
 | Job control | `get_job_status` | Read a job's status, progress and compact terminal summary with persisted record IDs. |
 | Job control | `cancel_job` | Request cancellation of a pending, running or paused LLM job. |
 | Job control | `answer_job_question` | Resume a paused job with answers to the questions returned under pause. |
-| Job control | `answer_llm_request` | Answer one LLM request of a job running on your model (every start tool's default unless use_platform_models=true or an explicit platform model): you are its model. |
+| Job control | `answer_llm_request` | Submit the result of one pending model call of a delegated job: a job the user started on the client's own model (every start tool's default unless use_platform_models=true or an… |
 | Records & stats | `list_records` | List compact, paginated records in your organization, most recent first. |
 | Records & stats | `get_record` | Read one persisted record's structured_output, entity_input_data, validation errors, expertise verdicts and metrics. |
 | Records & stats | `get_stats` | Read organization-wide record totals, success rate, tokens and cost summary. |
