@@ -11,7 +11,7 @@ From an MCP-compatible client you can:
 - Enrich single entities or lists, with multilingual fields and multiple models.
 - Fuse results and recover failed expertise domains without repeating successful work.
 - Resolve recurring objects to semantic identities and curate their aliases or uncertain matches.
-- Derive relational tables and migrations for your PostgreSQL, MySQL or SQLite database.
+- Derive relational tables and migrations for your PostgreSQL or SQL Server database.
 - Benchmark enrichment, sample generation and schema generation on your own tasks.
 
 Schema validation and model agreement do not establish factual truth or freshness.
@@ -196,7 +196,7 @@ individual tool contracts; ordinary calls do not require reading them all.
 | Attachments | `delete_attachment` | Permanently delete an attachment in your organization, including its stored file. |
 | Database Sync | `list_database_syncs` | List a saved schema's database registrations, linked schemas, options and sync hosts. |
 | Database Sync | `list_entity_states` | Browse a schema's current merged entity rows, not per-run records. |
-| Database Sync | `create_database_sync` | Register a saved schema for relational synchronization to PostgreSQL, MySQL or SQLite. |
+| Database Sync | `create_database_sync` | Register a saved schema for relational synchronization to PostgreSQL or SQL Server. |
 | Database Sync | `assign_sync_host` | Assign or clear the host provisioning a database sync. |
 | Database Sync | `classify_database_model` | Start a billed analysis proposing database keys, SQL types, indexes and relationship ownership on a linked schema. |
 | Database Sync | `delete_database_sync` | Delete a database registration and its queued deltas, stopping its feed. |

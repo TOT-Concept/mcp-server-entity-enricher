@@ -149,6 +149,9 @@ ee-database pair --server https://entityenricher.ai
 ee-database run --dsn "postgres://me:secret@localhost:5432/catalogue" --create-missing
 ```
 
+For a sync registered with `dialect="sqlserver"`, the DSN is
+`sqlserver://me:secret@localhost:1433?database=catalogue`.
+
 The DSN never leaves your machine — Entity Enricher holds no credential to your database, and
 the client connects outward over WSS. The installer verifies the binary's Sigstore signature
 against the release workflow's identity before making it executable.
